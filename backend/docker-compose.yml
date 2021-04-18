@@ -1,0 +1,27 @@
+version: '3.7'
+services:
+  aircnc-db-api:
+    container_name: aircnc-db-container
+    image: mongo:3
+    restart: always
+    volumes:
+      - ./data:/data/db
+    ports:
+      - 9001:27017
+  aircnc-api:
+    container_name: aircnc-api-container
+    image: node:12
+    working_dir: /usr/src/aircnc-api
+    restart: always
+    command: bash -c "npm install && npm start"
+    environment:
+      MONGO_URL: ${MONGO_URL}
+      APP_PORT: ${APP_PORT}
+      API_EXTERNAL_URL: ${API_EXTERNAL_URL}
+    volumes:
+      - ./src/:/usr/src/aircnc-api/src/
+      - ./package.json:/usr/src/aircnc-api/package.json
+    ports:
+      - 10334:3333
+    links:
+      - aircnc-db-api
